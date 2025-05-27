@@ -32,6 +32,12 @@ class BilingualDataset(Dataset):
         enc_input_tokens = self.tokenizer_src.encode(src_text).ids
         dec_input_tokens = self.tokenizer_tgt.encode(tgt_text).ids
         
+        # Truncate here to fit within seq_len
+        max_enc_len = self.seq_len - 2  # [SOS] + tokens + [EOS]
+        max_dec_len = self.seq_len - 1  # [SOS] + tokens
+
+        enc_input_tokens = enc_input_tokens[:max_enc_len]
+        dec_input_tokens = dec_input_tokens[:max_dec_len]
         
         enc_num_padding_tokens = self.seq_len - len(enc_input_tokens) -2# we add sos and eos
         dec_num_padding_tokens = self.seq_len - len(dec_input_tokens) -1 
