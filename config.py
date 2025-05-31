@@ -3,10 +3,10 @@ import regex as re
 def get_config():
     return {
         "batch_size": 8,
-        "num_epochs": 20,
+        "num_epochs": 15,
         "lr": 10**-4,
-        "seq_len": 500,
-        "d_model": 512,
+        "seq_len": 128,
+        "d_model": 256,
         "datasource": 'opus_books',
         "lang_src": "nepali",
         "lang_tgt": "english",
