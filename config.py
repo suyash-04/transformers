@@ -3,13 +3,13 @@ import regex as re
 def get_config():
     return {
         "batch_size": 8,
-        "num_epochs": 15,
+        "num_epochs": 20,
         "lr": 10**-4,
-        "seq_len": 128,
+        "seq_len": 100,
         "d_model": 256,
         "datasource": 'opus_books',
-        "lang_src": "nepali",
-        "lang_tgt": "english",
+        "lang_src": "ne",
+        "lang_tgt": "en",
         "model_folder": "weights",
         "model_basename": "tmodel_",
         "preload": None,

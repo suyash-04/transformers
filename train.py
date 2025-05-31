@@ -32,8 +32,8 @@ def get_tokenizer(config, ds, lang):
         tokenizer = Tokenizer(WordLevel(unk_token="[UNK]", vocab={}))
         
         # Set pre-tokenizer
-        tokenizer.pre_tokenizer = Whitespace
-        
+        whitespace_token = Whitespace()
+        tokenizer.pre_tokenizer = whitespace_token
         # Set up trainer
         trainer = WordLevelTrainer(
             special_tokens=["[UNK]", "[PAD]", "[SOS]", "[EOS]"],
@@ -51,13 +51,21 @@ def get_tokenizer(config, ds, lang):
 
 
 def get_ds(config):
-    ds = load_dataset("iamTangsang/Nepali-to-English-Translation-Dataset")
-    ds_raw = concatenate_datasets([ds["train"], ds["validation"], ds["test"]])
-    ds_raw = ds_raw.rename_columns({
-    "source": "nepali",
-    "target": "english"
-    })
-    
+    ds_all = load_dataset("sharad461/ne-en-parallel-208k", split='train')
+
+    # lets use only 10% of the data
+    subset_size = int(0.1 * len(ds_all))
+    ds_raw = ds_all.select(range(subset_size))
+    print(f"Using {subset_size} samples out of {len(ds_all)}")
+    print(ds_raw[0])
+
+    # build the tokenizers
+    tokenizer_src = get_tokenizer(config, ds_raw, config['lang_src'])
+    tokenizer_tgt = get_tokenizer(config, ds_raw, config['lang_tgt'])
+
+    # now 90% for training and remaning for validation
+    train_ds_size = int(len(ds_raw) * 0.9)
+    val_ds_size = len(ds_raw) - train_ds_size
     tokenizer_src = get_tokenizer(config, ds_raw, config['lang_src'])
     tokenizer_tgt = get_tokenizer(config, ds_raw, config['lang_tgt'])
     
