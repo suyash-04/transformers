@@ -3,3 +3,4 @@ numpy
 pandas
 datasets
 tokenizers==0.10.3
+torchmetrics
