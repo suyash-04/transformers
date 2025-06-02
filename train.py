@@ -26,7 +26,9 @@ def greedy_decode( model , source ,source_mask, tokernizer_src, tokenizer_tgt, m
     eos_idx = tokenizer_tgt.token_to_id('[EOS]')
     
     encoder_output  = model.encode(source , source_mask)
-    decoder_input = torch.empty(1,1).fill(sos_idx).type_as(source).to(device)
+    decoder_input = torch.empty(1, 1, dtype=source.dtype).to(device).fill_(sos_idx)
+
+
     
     while True:
         if decoder_input.size(1) == max_len:
@@ -36,7 +38,7 @@ def greedy_decode( model , source ,source_mask, tokernizer_src, tokenizer_tgt, m
         
         out = model.decode(encoder_output, decoder_input ,decode_mask, source_mask)
         
-        prob = model.project(out[: ,-1])
+        prob = model.projection(out[: ,-1])
         _, next_word = torch.max(prob , dim=1 )
         decoder_input = torch.cat(
             [decoder_input, torch.empty(1,1,).type_as(source).fill_(next_word.item()).to(device)] , dim = 1
@@ -44,7 +46,7 @@ def greedy_decode( model , source ,source_mask, tokernizer_src, tokenizer_tgt, m
         if next_word == eos_idx:
             break
         
-        return decoder_input.squeeze(0)
+    return decoder_input.squeeze(0)
     
 def run_validation(model , validation_ds , tokenizer_src , tokenizer_tgt , max_len , device , print_msg , global_step , writer , num_examples = 2):
     model.eval()
@@ -72,8 +74,9 @@ def run_validation(model , validation_ds , tokenizer_src , tokenizer_tgt , max_l
             model_out = greedy_decode(model , encoder_input , encoder_mask, tokenizer_src, tokenizer_tgt , max_len , device)
             
             source_text = batch['src_text'][0]
-            target_text = batch['target_text'][0]
-            model_out_text = tokenizer_tgt.decode(model_out.detach().cpu().numpy())
+            target_text = batch['tgt_text'][0]
+            model_out_text = tokenizer_tgt.decode(model_out.detach().cpu().tolist(), skip_special_tokens=True)
+
             
             source_texts.append(source_text)
             expected.append(target_text)
@@ -86,7 +89,7 @@ def run_validation(model , validation_ds , tokenizer_src , tokenizer_tgt , max_l
             if count == num_examples:
                 print_msg('-'*console_width)
                 break
-         if writer:
+    if writer:
         # Evaluate the character error rate
             # Compute the char error rate 
             metric = torchmetrics.CharErrorRate()

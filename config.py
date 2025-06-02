@@ -1,12 +1,13 @@
 from pathlib import Path
 import regex as re 
 def get_config():
+    print("DEBUG: Loading config from config.py")
     return {
-        "batch_size": 8,
+        "batch_size": 64,
         "num_epochs": 20,
         "lr": 10**-4,
         "seq_len": 100,
-        "d_model": 256,
+        "d_model": 512,
         "datasource": 'opus_books',
         "lang_src": "ne",
         "lang_tgt": "en",
