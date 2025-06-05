@@ -62,4 +62,4 @@ def translate(sentence: str):
                 break
     return tokenizer_tgt.decode(decoder_input[0].tolist())
 
-translate(sys.argv[1] if len(sys.argv) > 1 else "“मैले धेरै पल्ट सुनेकोछु")
+translate(sys.argv[1] if len(sys.argv) > 1 else "“मैले धेरै पल्ट सुनेकोछु") 
